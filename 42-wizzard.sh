@@ -209,6 +209,8 @@ _wz_clean_targets() {
 }
 
 42-wizzard-storage() {
+	# not "path": in zsh that is tied to $PATH, and overwriting it breaks the user's shell
+	local size entry
 	printf '• Total storage:     %s%s%s\n' "$WZ_BLUE" "$(_wz_df 2)" "$WZ_RESET"
 	printf '• Used storage:      %s%s%s\n' "$WZ_RED" "$(_wz_df 3)" "$WZ_RESET"
 	printf '• Available storage: %s%s%s\n' "$WZ_GREEN" "$(_wz_df 4)" "$WZ_RESET"
@@ -218,13 +220,13 @@ _wz_clean_targets() {
 	fi
 	printf '%sBiggest folders in ~:%s\n' "$WZ_YELLOW" "$WZ_RESET"
 	du -xh --max-depth=1 "$HOME" 2>/dev/null | sort -rh | sed -n '2,11p' |
-		while IFS=$'\t' read -r size path; do
-			printf '  %s%8s%s  ~%s\n' "$WZ_GREEN" "$size" "$WZ_RESET" "${path#"$HOME"}"
+		while IFS=$'\t' read -r size entry; do
+			printf '  %s%8s%s  ~%s\n' "$WZ_GREEN" "$size" "$WZ_RESET" "${entry#"$HOME"}"
 		done
 	printf '%sHeavy files (>50M):%s\n' "$WZ_YELLOW" "$WZ_RESET"
 	find "$HOME" -xdev -type f -size +50M -printf '%s\t%p\n' 2>/dev/null | sort -nr | head -n 20 |
-		while IFS=$'\t' read -r size path; do
-			printf '  %s%8s%s  ~%s\n' "$WZ_GREEN" "$(numfmt --to=iec "$size")" "$WZ_RESET" "${path#"$HOME"}"
+		while IFS=$'\t' read -r size entry; do
+			printf '  %s%8s%s  ~%s\n' "$WZ_GREEN" "$(numfmt --to=iec "$size")" "$WZ_RESET" "${entry#"$HOME"}"
 		done
 }
 
